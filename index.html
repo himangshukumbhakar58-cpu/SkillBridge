@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillBridge | Learn & Trade</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Vector Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 3D & Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- 3D Vanta Background Canvas -->
+    <div id="vanta-bg"></div>
+
+    <!-- Auth View -->
+    <div id="auth-view" class="view active">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="logo">
+                    <i class="fa-solid fa-bridge"></i> SkillBridge
+                </div>
+                <h2>Welcome Back</h2>
+                <p class="subtitle">Join the trusted student network.</p>
+
+                <div class="auth-options">
+                    <button class="btn btn-primary w-100" onclick="login('college_student')">
+                        <i class="fa-solid fa-graduation-cap"></i> Login with College Email
+                    </button>
+                    <p class="text-sm mt-2 text-gray">For Verified Students (Full Access)</p>
+
+                    <div class="divider"><span>OR</span></div>
+
+                    <button class="btn btn-outline w-100" onclick="login('open_user')">
+                        <i class="fa-brands fa-google"></i> Continue with Google
+                    </button>
+                    <p class="text-sm mt-2 text-gray">For Open Users (Learn Only)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App View -->
+    <div id="app-view" class="view">
+        <!-- Sticky Glass Navbar -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fa-solid fa-bridge"></i> SkillBridge
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link active" data-target="dashboard"><i class="fa-solid fa-house"></i> Dashboard</a>
+                <a href="#" class="nav-link" data-target="marketplace"><i class="fa-solid fa-shop"></i> Marketplace</a>
+                <a href="#" class="nav-link" data-target="learn"><i class="fa-solid fa-book-open"></i> Learn</a>
+                <a href="#" class="nav-link student-only" data-target="teach"><i class="fa-solid fa-chalkboard-user"></i> Teach</a>
+            </div>
+            <div class="nav-user">
+                <span id="user-badge" class="badge"></span>
+                <a href="#" class="nav-link" data-target="profile"><i class="fa-solid fa-circle-user"></i> <span id="user-name">User</span></a>
+                <button class="btn btn-sm btn-outline" onclick="logout()" title="Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+            </div>
+        </nav>
+
+        <!-- Main Content Wrapper -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="page-section active">
+                <div class="header-banner">
+                    <h1>Hello, <span id="dash-user-name"></span>! 👋</h1>
+                    <p>Welcome to SkillBridge. What would you like to do today?</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dash-card" onclick="navigate('marketplace')">
+                        <div class="dash-icon bg-blue-light"><i class="fa-solid fa-shop text-blue"></i></div>
+                        <h3>Marketplace</h3>
+                        <p>Buy & sell books, notes, and tools.</p>
+                    </div>
+                    <div class="dash-card" onclick="navigate('learn')">
+                        <div class="dash-icon bg-purple-light"><i class="fa-solid fa-book-open text-purple"></i></div>
+                        <h3>Learn Skills</h3>
+                        <p>Find mentors and book sessions.</p>
+                    </div>
+                    <div class="dash-card student-only" onclick="navigate('teach')">
+                        <div class="dash-icon bg-green-light"><i class="fa-solid fa-chalkboard-user text-green"></i></div>
+                        <h3>Teach Skills</h3>
+                        <p>Share your knowledge and earn.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Marketplace Section -->
+            <section id="marketplace" class="page-section">
+                <div class="section-header">
+                    <h2>Marketplace</h2>
+                    <button class="btn btn-primary student-only" onclick="alert('Item listing form opens here in full backend version!')"><i class="fa-solid fa-plus"></i> List Item</button>
+                </div>
+                <div class="grid-layout" id="marketplace-container">
+                    <!-- Cards injected dynamically by script.js -->
+                </div>
+            </section>
+
+            <!-- Learn Section -->
+            <section id="learn" class="page-section">
+                <div class="section-header">
+                    <h2>Find a Mentor</h2>
+                    <div class="search-bar">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="mentor-search-input" placeholder="Search skills..." onkeyup="filterMentors(this.value)">
+                    </div>
+                </div>
+                <div class="grid-layout" id="mentors-container">
+                    <!-- Cards injected dynamically by script.js -->
+                </div>
+            </section>
+
+            <!-- Teach Section -->
+            <section id="teach" class="page-section student-only">
+                <div class="section-header">
+                    <h2>Become a Mentor</h2>
+                </div>
+                <div class="teach-container">
+                    <div class="card">
+                        <h3>Share Your Expertise</h3>
+                        <p>Help other students while earning trust score and money.</p>
+                        <form class="mt-4" onsubmit="handleTeachSubmit(event)">
+                            <div class="form-group">
+                                <label>Skill to Teach</label>
+                                <input type="text" class="form-control" placeholder="e.g. Graphic Design, Calculus" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Experience Level</label>
+                                <select class="form-control">
+                                    <option>Beginner</option>
+                                    <option>Intermediate</option>
+                                    <option>Expert</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary mt-2">Apply as Mentor</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile" class="page-section">
+                <div class="profile-layout">
+                    <div class="profile-card card">
+                        <div class="profile-header text-center">
+                            <i class="fa-solid fa-circle-user fa-5x text-blue mb-3"></i>
+                            <h2 id="prof-name">Name</h2>
+                            <p id="prof-college" class="text-gray mb-2">College</p>
+                            <div id="prof-badges" class="badges-container mb-3"></div>
+                        </div>
+                        <div class="profile-stats mt-4">
+                            <div class="stat-box">
+                                <h3>Trust Score</h3>
+                                <div class="score text-blue" id="prof-score">0</div>
+                            </div>
+                            <div class="stat-box">
+                                <h3>Reviews</h3>
+                                <div class="score">4.8 <i class="fa-solid fa-star text-yellow" style="font-size: 1rem;"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="payment-modal" class="modal">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h3>Complete Payment</h3>
+                <button class="btn-close" onclick="closeModal('payment-modal')"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <p class="mb-3">Scan QR code or use UPI to pay <strong id="pay-amount"></strong></p>
+                <div class="qr-placeholder mb-3">
+                    <img src="assets/qr-code.svg" alt="UPI QR Code" style="width: 140px; height: 140px;">
+                </div>
+                <p class="text-sm text-gray mb-4">UPI ID: skillbridge@upi</p>
+                <button class="btn btn-primary w-100" onclick="completePayment()">Payment Completed</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Logic Script -->
+    <script src="script.js"></script>
+</body>
+
+</html>
